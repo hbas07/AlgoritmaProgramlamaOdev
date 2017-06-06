@@ -1,0 +1,189 @@
+typedef struct {
+ char isim[30];
+ long int kod;
+ long int numara;
+ } kayit;
+
+FILE *fp;
+kayit rehber;
+
+int main()
+{
+    setlocale(LC_ALL, "Turkish");
+    int islem,cevap;
+    while(islem!=7){
+    printf ("\t<-<-<-<-<-TELEFON REHBERI->->->->->\n\n");
+    printf ("\n ISLEMLER \n");
+    printf ("1.Kayit Ekle\n");
+    printf ("2.Telefonlari Listele\n");
+    printf ("3.Kaydi Duzenle\n");
+    printf ("4.Numara ile Kayit Bul\n");
+    printf ("5.Isim ile Kayit Bul \n");
+    printf ("6.Kayit Sil\n");
+    printf ("7.Cikis\n\n\n");
+    printf ("Yapmak istediginiz islemin kodunu giriniz : "); scanf("%d",&islem);
+    printf("\n\n");
+
+    if (islem==1)
+    {
+        printf ("Isim giriniz (Maximum 30 karakter) : "); scanf("%s",&rehber.isim);
+        printf ("Kod giriniz : "); scanf("%d",&rehber.kod);
+        printf ("No giriniz : "); scanf ("%d",&rehber.numara);
+        fp=fopen("TelefonRehber.txt","a+");
+        fwrite(&rehber,sizeof(rehber),1,fp);
+        fclose(fp);
+        printf("Kayit Basarili \n\n");
+}
+    else if (islem==2)
+        KayitListele();
+    else if (islem==3)
+        KayitDuzenle();
+    else if(islem==4)
+        KayitBul();
+    else if(islem==5)
+        IsimdenKayitBul();
+    else if (islem==6)
+        KayitSil();
+    else if (islem==7)
+        break;
+    else
+        printf("Hatali giris yaptiniz \n");
+    }
+    return 0;
+}
+
+void KayitListele()
+{
+    fp=fopen("TelefonRehber.txt","r");
+    printf ("AD \t KOD \t NUMARA \n");
+    while (fread(&rehber,sizeof(rehber),1,fp)!=NULL)
+    {
+    printf ("%s \t %d \t %d \n",rehber.isim,rehber.kod,rehber.numara);
+    }
+    printf ("\n\n");
+    fclose(fp);
+}
+
+void KayitBul()
+{
+    int arananNo,k=0;
+    printf ("Bulmak istediginiz numarayi giriniz : "); scanf("%d",&arananNo);
+    fp=fopen("TelefonRehber.txt","r");
+
+    while(!feof(fp))
+    {
+         fread(&rehber,sizeof(rehber),1,fp);
+         if (arananNo==rehber.numara) {
+            printf("Kayit Bulundu\n");
+            printf ("%s\t%d\t%d\n",rehber.isim,rehber.kod,rehber.numara);
+            k=1;
+            break;
+        }
+    }
+    if (k==0)
+        printf ("Kayit Bulunamadi.....\n");
+
+    fclose(fp);
+}
+
+void IsimdenKayitBul()
+{
+    char arananAd[30];
+    int k=0;
+    printf ("Bulmak istediginiz kisinin ismini giriniz : "); scanf("%s",&arananAd);
+    fp=fopen("TelefonRehber.txt","r");
+    while(!feof(fp))
+    {
+        fread(&rehber,sizeof(rehber),1,fp);
+        if(strcmp(arananAd,rehber.isim) == 0)
+           {
+            printf ("Kisi bulundu \n");
+            printf ("%s\t",rehber.isim);
+            printf ("%d\t",rehber.kod);
+            printf("%d\n",rehber.numara);
+            k++;
+            break;
+           }
+    }
+     if (k==0)
+        printf ("Kayit Bulunamadi.....\n");
+
+        fclose(fp);
+}
+ void KayitSil()
+ {   FILE *fd;
+     int Kod,k=0,cevap;
+     do{
+     printf ("Silmek istediginiz kisinin kodunu girin : "); scanf("%d",&Kod);
+     fp=fopen("TelefonRehber.txt","r");
+     fd=fopen("TelefonRehber1.txt","w");
+     while (fread(&rehber,sizeof(rehber),1,fp)!=NULL)
+     {
+        if (Kod==rehber.kod){
+            k=1;
+            continue;
+        }
+        else
+            fwrite(&rehber,sizeof(rehber),1,fd);
+     }
+     if (k==1)
+     {
+      _fcloseall();
+     remove("TelefonRehber.txt");
+     rename("TelefonRehber1.txt","TelefonRehber.txt");
+     printf("Kayit basariyla silindi...\n");
+     break;
+     }
+     _fcloseall();
+     remove("TelefonRehber1.txt");
+     if (k!=1){
+        printf("Yanlis giris yaptiniz...\n");
+        printf ("Tekrar aramak icin 1'e Menuye donmek icin 2'ye basin..");
+        scanf("%d",&cevap);
+     }
+     }while(cevap!=2);
+    }
+
+ void KayitDuzenle()
+ {
+     FILE *fd;
+     char arama[30];
+     int k=0,cevap;
+     do{
+     printf("Kaydini duzenlemek istediginiz ismi giriniz : "); scanf ("%s",&arama);
+     fp=fopen("TelefonRehber.txt","r");
+     fd=fopen("TelefonRehber1.txt","w");
+
+     while (fread(&rehber,sizeof(rehber),1,fp)!=NULL)
+    {
+          if(strcmp(arama,rehber.isim)==0)
+               {   printf ("Yeni bilgileri giriniz : <Ad,kod,numara> \t");
+                   scanf("%s \t %d \t %d",&rehber.isim,&rehber.kod,&rehber.numara);
+                   fwrite(&rehber,sizeof(rehber),1,fd);
+                   k=1;
+               }
+          else
+            fwrite(&rehber,sizeof(rehber),1,fd);
+    }
+    if (k==1){
+     _fcloseall();
+     remove("TelefonRehber.txt");
+     rename("TelefonRehber1.txt","TelefonRehber.txt");
+     break;
+        }
+    _fcloseall();
+     remove("TelefonRehber1.txt");
+     if (k!=1){
+        printf("Yanlis giris yaptiniz...\n");
+        printf ("Tekrar aramak icin 1'e Menuye donmek icin 2'ye basin..");
+        scanf("%d",&cevap);
+     }
+
+     }while(cevap!=2);
+
+ }
+
+
+
+
+
